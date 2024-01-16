@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\" />
+    <Folder Include="Values\" />
   </ItemGroup>
 
 </Project>
