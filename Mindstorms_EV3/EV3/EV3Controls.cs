@@ -1,24 +1,31 @@
-﻿using Mindstorms.Core.EV3;
+﻿
 using Mindstorms.Core.Music;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MonoBrick.EV3;
 
 namespace Mindstorms_EV3.EV3
 {
     public class EV3Controls
     {
-        Brick brick = new Brick("COM1");
+
         
         private void connectBrick()
         {
- 
-            brick.Connect();
-            var connectString = brick.IsConnected ? "Kostka pripojena" : "Kostka nepripojena";
-            Console.WriteLine(connectString);
-            brick.Beep(5, 500);
+            var brick = new Brick<Sensor, Sensor, Sensor, Sensor>("USB");
+            try{
+                brick.Connection.Open();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            var connectionString = brick.Connection == null ? "Brick is not connected!" : "Brick is successfully connected!";
+            Console.WriteLine(connectionString);
+            
         }
 
         public void init()
