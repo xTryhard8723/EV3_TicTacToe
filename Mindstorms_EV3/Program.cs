@@ -8,7 +8,5 @@ public class Program
     {
         EV3Controls eV3Controls = new EV3Controls();
         eV3Controls.init();
-
-
     }
 }
