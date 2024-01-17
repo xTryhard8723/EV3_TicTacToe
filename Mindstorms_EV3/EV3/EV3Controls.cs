@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MonoBrick.EV3;
+using System.Speech.Synthesis;
+using EV3_TicTacToe.Audio;
+using Mindstorms.Core.Commands.Speaker;
 
 namespace Mindstorms_EV3.EV3
 {
@@ -54,6 +57,17 @@ namespace Mindstorms_EV3.EV3
 
         }
 
+        private void turnPlayerX(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            brick.PlayTone(100, 2600, 50);
+        }
+
+        private void turnPlayerO(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            brick.PlayTone(100, 1600, 50);
+            //brick.Beep(100, 20);
+        }
+
         private void connectBrick(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
 
@@ -93,7 +107,10 @@ namespace Mindstorms_EV3.EV3
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             connectBrick(brick);
-            disconnectBrick(brick);
+            turnPlayerO(brick);
+            Thread.Sleep(1500);
+            turnPlayerX(brick);
+            // disconnectBrick(brick);
         }
 
     }
