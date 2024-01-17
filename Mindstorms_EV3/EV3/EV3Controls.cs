@@ -18,6 +18,41 @@ namespace Mindstorms_EV3.EV3
         {' ', ' ', ' '}
         };
 
+        private void moveOnGrid(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            ///TODO: Check the whole grid and read it, if the return value from readgrid is 1, read the one that it returned again
+        }
+
+        private char readGrid(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            var colorReadSensor = new ColorSensor();
+            brick.Sensor1 = colorReadSensor;
+            colorReadSensor.Initialize();
+
+            Color readColor = colorReadSensor.ReadColor();
+            char returnValue;
+            switch (readColor)
+            {
+                case Color.Red:
+                    {
+                        returnValue = 'X';
+                        break;
+                    }
+                case Color.Green:
+                    {
+                        returnValue = 'O';
+                        break;
+                    }
+                default:
+                    {
+                        returnValue = '1';
+                        break;
+                    }
+            }
+
+            return returnValue;
+
+        }
 
         private void connectBrick(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
