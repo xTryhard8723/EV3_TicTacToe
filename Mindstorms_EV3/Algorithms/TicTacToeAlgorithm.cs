@@ -16,14 +16,17 @@ namespace Mindstorms_EV3.Algorithms
         private char computer = 'O';
 
 
-        private void ComputerMove()
+
+
+        public int[] ev3Move()
         {
-            int[] move = GetBestMove();
+            int[] move = getBestMove();
             board[move[0], move[1]] = computer;
             EV3Controls.setBoard(board);
+            return move;
         }
 
-        private int[] GetBestMove()
+        private int[] getBestMove()
         {
             int[] bestMove = { -1, -1 };
             int bestScore = int.MinValue;
@@ -35,7 +38,7 @@ namespace Mindstorms_EV3.Algorithms
                     if (board[i, j] == ' ')
                     {
                         board[i, j] = computer;
-                        int score = Minimax(board, 0, false);
+                        int score = minimax(board, 0, false);
                         board[i, j] = ' ';
 
                         if (score > bestScore)
@@ -52,15 +55,15 @@ namespace Mindstorms_EV3.Algorithms
         }
 
 
-        private int Minimax(char[,] currentBoard, int depth, bool isMaximizing)
+        private int minimax(char[,] currentBoard, int depth, bool isMaximizing)
         {
-            char result = CheckWinner();
+            char result = checkWinner();
             if (result != ' ')
             {
                 return result == computer ? 1 : -1;
             }
 
-            if (IsBoardFull())
+            if (isBoardFull())
             {
                 return 0;
             }
@@ -74,7 +77,7 @@ namespace Mindstorms_EV3.Algorithms
                     if (currentBoard[i, j] == ' ')
                     {
                         currentBoard[i, j] = isMaximizing ? computer : player;
-                        int score = Minimax(currentBoard, depth + 1, !isMaximizing);
+                        int score = minimax(currentBoard, depth + 1, !isMaximizing);
                         currentBoard[i, j] = ' ';
 
                         if (isMaximizing)
@@ -88,7 +91,7 @@ namespace Mindstorms_EV3.Algorithms
             return bestScore;
         }
 
-        private char CheckWinner()
+        public char checkWinner()
         {
             // Check rows, columns, and diagonals
             for (int i = 0; i < 3; i++)
@@ -109,7 +112,7 @@ namespace Mindstorms_EV3.Algorithms
             return ' ';
         }
 
-        private bool IsBoardFull()
+        public bool isBoardFull()
         {
             for (int i = 0; i < 3; i++)
             {
