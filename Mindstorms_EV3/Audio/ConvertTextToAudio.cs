@@ -2,12 +2,14 @@
 using System.Speech.AudioFormat;
 using NAudio.Lame;
 using NAudio.Wave;
+using System.Runtime.Versioning;
 
 namespace EV3_TicTacToe.Audio
 {
+    [SupportedOSPlatform("windows")]
     public class ConvertTextToAudio
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        
         private string? finalFileName;
         public void convert(string text, string? filename = "defaultAudio")
         {
@@ -27,6 +29,7 @@ namespace EV3_TicTacToe.Audio
             convertWavStreamToMp3File(ref stream, finalFileName);
         }
 
+        [SupportedOSPlatform("windows")]
         public string audioFileName()
         {
             return finalFileName;

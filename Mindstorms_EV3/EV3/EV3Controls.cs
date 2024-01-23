@@ -15,7 +15,7 @@ namespace Mindstorms_EV3.EV3
 {
     public class EV3Controls
     {
-        private TicTacToeAlgorithm algorithm = new TicTacToeAlgorithm();
+        private readonly TicTacToeAlgorithm algorithm = new TicTacToeAlgorithm();
 
         private static char[,] board = {
         {' ', ' ', ' '},
@@ -26,11 +26,26 @@ namespace Mindstorms_EV3.EV3
 
         private bool getStart(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            var touchSensor = new TouchSensor();
-            brick.Sensor3 = touchSensor;
-            touchSensor.Initialize();
-
-            return touchSensor.Read() == 1;
+            bool returnval;
+            SpeechToText speech = new SpeechToText();
+            SpeakAudio speechAudio = new SpeakAudio();
+        back:
+            switch (speech.getCommand().ToLower())
+            {
+                case "start the game":
+                    {
+                        speechAudio.speak("game will be started");
+                        returnval = true;
+                        break;
+                    }
+                default:
+                    {
+                        speechAudio.speak("please repeat");
+                        returnval = false;
+                        goto back;
+                    }
+            }
+            return returnval;
         }
 
         private void moveOnGrid(Brick<Sensor, Sensor, Sensor, Sensor> brick)
