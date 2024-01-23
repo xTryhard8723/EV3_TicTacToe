@@ -26,25 +26,34 @@ namespace Mindstorms_EV3.EV3
 
         private bool getStart(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            bool returnval;
             SpeechToText speech = new SpeechToText();
             SpeakAudio speechAudio = new SpeakAudio();
-        back:
-            switch (speech.getCommand().ToLower())
+
+            bool returnval = false;
+
+            while (true)
             {
-                case "start the game":
-                    {
+                string command = speech.getCommand().ToLower();
+
+                switch (command)
+                {
+                    case "start the game":
                         speechAudio.speak("game will be started");
                         returnval = true;
                         break;
-                    }
-                default:
-                    {
+
+                    default:
                         speechAudio.speak("please repeat");
-                        returnval = false;
-                        goto back;
-                    }
+                        break;
+                }
+
+                if (returnval || command == "exit")
+                {
+                    // Exit the loop when the desired condition is met
+                    break;
+                }
             }
+
             return returnval;
         }
 
