@@ -83,6 +83,32 @@ namespace Mindstorms_EV3.EV3
 
         }
 
+        public void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            var colorSensor = new ColorSensor();
+            var irSensor = new IRSensor();
+            var touchSensor = new TouchSensor();
+            brick.Sensor1 = touchSensor;
+            brick.Sensor2 = colorSensor;
+            brick.Sensor3 = irSensor;
+            var smallMotor = brick.MotorB;
+            var bigMotor = brick.MotorA;
+            smallMotor.On(50);
+            bigMotor.On(50);
+            Thread.Sleep(2000);
+            smallMotor.Off(true);
+            bigMotor.Off(true); 
+            bigMotor.MoveTo()
+
+            while (true)
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine($"Color Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
+                    $"Touch Sensor {touchSensor.ReadAsString()}\n\n");
+            }
+                    
+        }
+
         private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             var distanceSensor = new IRSensor();
@@ -195,7 +221,7 @@ namespace Mindstorms_EV3.EV3
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
 
-
+            connectBrick(brick);
             /*  connectBrick(brick);
               while(algorithm.checkWinner() == ' ' || algorithm.isBoardFull() || !getStart(brick))
               {
