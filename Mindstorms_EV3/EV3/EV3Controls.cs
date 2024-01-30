@@ -10,6 +10,7 @@ using System.Speech.Synthesis;
 using EV3_TicTacToe.Audio;
 using Mindstorms.Core.Commands.Speaker;
 using Mindstorms_EV3.Algorithms;
+using System.Runtime.Versioning;
 
 namespace Mindstorms_EV3.EV3
 {
@@ -23,7 +24,7 @@ namespace Mindstorms_EV3.EV3
         {' ', ' ', ' '}
         };
 
-
+        [SupportedOSPlatform("windows")]
         private bool getStart(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             SpeechToText speech = new SpeechToText();
