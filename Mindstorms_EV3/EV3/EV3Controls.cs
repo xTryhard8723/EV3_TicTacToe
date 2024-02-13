@@ -37,7 +37,7 @@ namespace Mindstorms_EV3.EV3
         {
             ///TODO: Check the whole grid and read it, if the return value from readgrid is 1, read the one that it returned again
 
-    
+
         }
 
         private void ev3Play()
@@ -51,7 +51,7 @@ namespace Mindstorms_EV3.EV3
                         break;
                     }
                 case 1:
-                    {   
+                    {
                         //motors bring middle row of board
                         break;
                     }
@@ -62,28 +62,28 @@ namespace Mindstorms_EV3.EV3
                     }
             }
 
-            switch(move[1])
+            switch (move[1])
             {
                 case 0:
-                {
-                    //motors bring go left or right and drop cube
-                    break;
-                }
+                    {
+                        //motors bring go left or right and drop cube
+                        break;
+                    }
                 case 1:
-                {
-                    //motors bring go left or right and drop cube
-                    break;
-                }
+                    {
+                        //motors bring go left or right and drop cube
+                        break;
+                    }
                 case 2:
-                {
-                    //motors bring go left or right and drop cube
-                    break;
-                }
+                    {
+                        //motors bring go left or right and drop cube
+                        break;
+                    }
             }
 
         }
 
-        public void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        private void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick, bool debugSensors = false)
         {
             var colorSensor = new ColorSensor();
             var irSensor = new IRSensor();
@@ -98,15 +98,20 @@ namespace Mindstorms_EV3.EV3
             Thread.Sleep(2000);
             smallMotor.Off(true);
             bigMotor.Off(true);
-           // bigMotor.MoveTo();
 
-            while (true)
+            if (colorSensor.ReadColor == null
+                || irSensor.ReadAsString() == null
+                || touchSensor.ReadAsString == null)
+            {
+                throw (new Exception("Some sensors are null!"));
+            }
+
+            for (int i = 0; i < 10 && debugSensors; i++)
             {
                 Thread.Sleep(1000);
                 Console.WriteLine($"Color Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
                     $"Touch Sensor {touchSensor.ReadAsString()}\n\n");
             }
-                    
         }
 
         private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -115,8 +120,8 @@ namespace Mindstorms_EV3.EV3
             brick.Sensor2 = distanceSensor;
             distanceSensor.Initialize();
 
-            while(distanceSensor.Read() < 255) 
-            { 
+            while (distanceSensor.Read() < 255)
+            {
                 Thread.Sleep(500);
             }
         }
@@ -171,10 +176,9 @@ namespace Mindstorms_EV3.EV3
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw (new Exception(ex.Message));
             }
-            var connectionString = brick.Connection == null ? "Brick is not connected!" : "Brick is successfully connected!";
-            Console.WriteLine(connectionString);
+            Console.WriteLine("Brick is connected!");
 
         }
 
@@ -198,7 +202,7 @@ namespace Mindstorms_EV3.EV3
             board = updatedBoard;
         }
 
-        public void inittest()
+        private void debugBoard()
         {
             while(algorithm.checkWinner() == ' ') {
                 ev3Play();
@@ -222,7 +226,7 @@ namespace Mindstorms_EV3.EV3
         {
 
             connectBrick(brick);
-            /*  connectBrick(brick);
+            checkSensors(brick, true);
               while(algorithm.checkWinner() == ' ' || algorithm.isBoardFull() || !getStart(brick))
               {
                   turnPlayerO(brick);
@@ -231,8 +235,8 @@ namespace Mindstorms_EV3.EV3
                   checkPlayerInput(brick);
                   readGrid(brick);
 
-              }*/
-            // disconnectBrick(brick);
+              }
+             disconnectBrick(brick);
         }
 
     }
