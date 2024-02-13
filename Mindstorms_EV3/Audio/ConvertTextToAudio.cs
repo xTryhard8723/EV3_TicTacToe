@@ -9,8 +9,9 @@ namespace EV3_TicTacToe.Audio
     [SupportedOSPlatform("windows")]
     public class ConvertTextToAudio
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        
         private string? finalFileName;
+
         public void convert(string text, string? filename = "defaultAudio")
         {
             if (text == null)

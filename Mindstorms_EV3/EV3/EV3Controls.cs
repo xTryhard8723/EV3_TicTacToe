@@ -1,4 +1,4 @@
-﻿
+
 using Mindstorms.Core.Music;
 using System;
 using System.Collections.Generic;
