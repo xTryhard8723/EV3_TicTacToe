@@ -97,8 +97,8 @@ namespace Mindstorms_EV3.EV3
             bigMotor.On(50);
             Thread.Sleep(2000);
             smallMotor.Off(true);
-            bigMotor.Off(true); 
-            bigMotor.MoveTo()
+            bigMotor.Off(true);
+           // bigMotor.MoveTo();
 
             while (true)
             {
