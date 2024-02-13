@@ -1,4 +1,4 @@
-﻿
+
 using Mindstorms.Core.Music;
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Mindstorms_EV3.EV3
 
         }
 
-        private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        private void ev3Play()
         {
             var move = algorithm.ev3Move();
             switch (move[0])
@@ -81,6 +81,37 @@ namespace Mindstorms_EV3.EV3
                     }
             }
 
+        }
+
+        private void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick, bool debugSensors = false)
+        {
+            var colorSensor = new ColorSensor();
+            var irSensor = new IRSensor();
+            var touchSensor = new TouchSensor();
+            brick.Sensor1 = touchSensor;
+            brick.Sensor2 = colorSensor;
+            brick.Sensor3 = irSensor;
+            var smallMotor = brick.MotorB;
+            var bigMotor = brick.MotorA;
+            smallMotor.On(50);
+            bigMotor.On(50);
+            Thread.Sleep(2000);
+            smallMotor.Off(true);
+            bigMotor.Off(true);
+
+            if (colorSensor.ReadColor == null
+                || irSensor.ReadAsString() == null
+                || touchSensor.ReadAsString == null)
+            {
+                throw (new Exception("Some sensors are null!"));
+            }
+
+            for (int i = 0; i < 10 && debugSensors; i++)
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine($"Color Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
+                    $"Touch Sensor {touchSensor.ReadAsString()}\n\n");
+            }
         }
 
         private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -145,10 +176,9 @@ namespace Mindstorms_EV3.EV3
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw (new Exception(ex.Message));
             }
-            var connectionString = brick.Connection == null ? "Brick is not connected!" : "Brick is successfully connected!";
-            Console.WriteLine(connectionString);
+            Console.WriteLine("Brick is connected!");
 
         }
 
@@ -172,19 +202,41 @@ namespace Mindstorms_EV3.EV3
             board = updatedBoard;
         }
 
+        private void debugBoard()
+        {
+            while(algorithm.checkWinner() == ' ') {
+                ev3Play();
+            }
+            Console.WriteLine($"Winner: {algorithm.checkWinner()} \n");
+   
+            for (int i = 0; i < 3; i++)
+            {
+                for(int j = 0; j < 3; j++)
+                {
+                    var consoleOut = board[i, j] == ' ' ? 'N' : board[i, j];
+                    Console.Write(consoleOut);
+                }
+                Console.WriteLine("\n");
+            }
+                
+           
+        }
+
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-              connectBrick(brick);
+
+            connectBrick(brick);
+            checkSensors(brick, true);
               while(algorithm.checkWinner() == ' ' || algorithm.isBoardFull() || !getStart(brick))
               {
                   turnPlayerO(brick);
-                  ev3Play(brick);
+
                   turnPlayerX(brick);
                   checkPlayerInput(brick);
                   readGrid(brick);
 
               }
-              disconnectBrick(brick);
+             disconnectBrick(brick);
         }
 
     }
