@@ -85,6 +85,7 @@ namespace Mindstorms_EV3.EV3
 
         private void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick, bool debugSensors = false)
         {
+            Console.WriteLine("Testing sensors...");
             var colorSensor = new ColorSensor();
             var irSensor = new IRSensor();
             var touchSensor = new TouchSensor();
@@ -93,23 +94,22 @@ namespace Mindstorms_EV3.EV3
             brick.Sensor3 = irSensor;
             var smallMotor = brick.MotorB;
             var bigMotor = brick.MotorA;
-            smallMotor.On(50);
-            bigMotor.On(50);
-            Thread.Sleep(2000);
-            smallMotor.Off(true);
-            bigMotor.Off(true);
+
 
             if (colorSensor.ReadColor == null
                 || irSensor.ReadAsString() == null
                 || touchSensor.ReadAsString == null)
             {
                 throw (new Exception("Some sensors are null!"));
+            }else
+            {
+                Console.WriteLine("Sensors tested!");
             }
 
             for (int i = 0; i < 10 && debugSensors; i++)
             {
                 Thread.Sleep(1000);
-                Console.WriteLine($"Color Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
+                Console.WriteLine($"\n\nColor Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
                     $"Touch Sensor {touchSensor.ReadAsString()}\n\n");
             }
         }
@@ -221,12 +221,18 @@ namespace Mindstorms_EV3.EV3
                 
            
         }
+        void WaitForMotorToStop(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            Thread.Sleep(500);
+            while (brick.MotorA.IsRunning()) { Thread.Sleep(50); }
+        }
 
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
 
             connectBrick(brick);
-            checkSensors(brick, true);
+           // checkSensors(brick, true);
+            /*checkSensors(brick, true);
               while(algorithm.checkWinner() == ' ' || algorithm.isBoardFull() || !getStart(brick))
               {
                   turnPlayerO(brick);
@@ -236,7 +242,30 @@ namespace Mindstorms_EV3.EV3
                   readGrid(brick);
 
               }
-             disconnectBrick(brick);
+             disconnectBrick(brick);*/
+            var tempsensor = new TouchSensor();
+            brick.Sensor1 = tempsensor;
+            uint test = 26;
+            while (tempsensor.Read() == 0)
+            {
+                brick.MotorA.ResetTacho(true);
+                Console.WriteLine(brick.MotorA.GetTachoCount());
+                Thread.Sleep(500);
+                brick.MotorA.On(5, test, true);
+                WaitForMotorToStop(brick);
+                Console.WriteLine("Position: " + brick.MotorA.GetTachoCount());
+                brick.MotorA.On(5, test, true);
+                WaitForMotorToStop(brick);
+                Console.WriteLine("Position: " + brick.MotorA.GetTachoCount());
+                brick.MotorA.On(5, test-4, true);
+                WaitForMotorToStop(brick);
+                Console.WriteLine("Position: " + brick.MotorA.GetTachoCount());
+                brick.MotorA.On(-5, 67, true);
+                WaitForMotorToStop(brick);
+                Console.WriteLine("Position: " + brick.MotorA.GetTachoCount());
+                brick.MotorA.Off(true);
+                Console.WriteLine("Position: " + brick.MotorA.GetTachoCount());
+            }
         }
 
     }
