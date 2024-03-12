@@ -11,6 +11,7 @@ namespace EV3_TicTacToe.Audio
     {
         
         private string? finalFileName;
+
         public void convert(string text, string? filename = "defaultAudio")
         {
             if (text == null)
@@ -32,7 +33,8 @@ namespace EV3_TicTacToe.Audio
         [SupportedOSPlatform("windows")]
         public string audioFileName()
         {
-            return finalFileName;
+            var returnValue = finalFileName is null ? "none" : finalFileName;
+            return returnValue;
         }
 
         private void convertWavStreamToMp3File(ref MemoryStream ms, string savetofilename)

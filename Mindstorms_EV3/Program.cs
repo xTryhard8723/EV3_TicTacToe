@@ -16,7 +16,7 @@ public class Program
 
         
         EV3Controls eV3Controls = new EV3Controls();
-        var brick = new Brick<Sensor, Sensor, Sensor, Sensor>("usb");
+           var brick = new Brick<Sensor, Sensor, Sensor, Sensor>("usb");
         eV3Controls.init(brick);
       
     }
