@@ -1,14 +1,4 @@
-
-using Mindstorms.Core.Music;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoBrick.EV3;
-using System.Speech.Synthesis;
-using EV3_TicTacToe.Audio;
-using Mindstorms.Core.Commands.Speaker;
 using Mindstorms_EV3.Algorithms;
 
 namespace Mindstorms_EV3.EV3
