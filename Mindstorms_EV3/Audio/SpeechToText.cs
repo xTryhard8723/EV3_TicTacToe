@@ -13,11 +13,12 @@ namespace EV3_TicTacToe.Audio
     {
 
         private string recognizedText = string.Empty;
-        private readonly SpeechRecognitionEngine speechRecognizer = new SpeechRecognitionEngine();
 
         [SupportedOSPlatform("windows")]
         public string getCommand()
         {
+            SpeechRecognitionEngine speechRecognizer = new SpeechRecognitionEngine();
+            Console.WriteLine("Listening for input!");
             var dictationGrammar = new DictationGrammar();
             speechRecognizer.LoadGrammar(dictationGrammar);
 
@@ -36,7 +37,7 @@ namespace EV3_TicTacToe.Audio
             //debug:
             //Console.ReadLine();  
 
-            //Console.WriteLine($"Final Recognized Text: {recognizedText}");
+            Console.WriteLine($"Final Recognized Text: {recognizedText}");
             speechRecognizer.Dispose();
             return recognizedText;
         }

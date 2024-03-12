@@ -1,6 +1,7 @@
 using MonoBrick.EV3;
 using Mindstorms_EV3.Algorithms;
 using System.Runtime.Versioning;
+using EV3_TicTacToe.Audio;
 
 namespace Mindstorms_EV3.EV3
 {
@@ -29,6 +30,11 @@ namespace Mindstorms_EV3.EV3
                 switch (command)
                 {
                     case "start the game":
+                        speechAudio.speak("game will be started");
+                        returnval = true;
+                        break;
+
+                    case "start a game":
                         speechAudio.speak("game will be started");
                         returnval = true;
                         break;
@@ -278,6 +284,10 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
+            while (getStart(brick))
+            {
+                checkFullArmMovement(brick);
+            }
             //checkFullArmMovement(brick);
             //     checkSensors(brick, true);
             /*
