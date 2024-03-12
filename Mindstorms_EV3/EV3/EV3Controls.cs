@@ -1,5 +1,6 @@
 using MonoBrick.EV3;
 using Mindstorms_EV3.Algorithms;
+using Mindstorms.Core.Commands.Mathematics.Arithmetic;
 
 namespace Mindstorms_EV3.EV3
 {
@@ -117,20 +118,51 @@ namespace Mindstorms_EV3.EV3
                 if (debugConsole) { Console.WriteLine($"Tacho count: {brick.MotorA.GetTachoCount()}"); }
                 Thread.Sleep(500);
                 brick.MotorA.On(5, thirdPosition, true);
-                WaitForMotorToStop(brick);
+                WaitForMotorToStop(brick, 'A');
                 if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
                 brick.MotorA.On(5, thirdPosition, true);
-                WaitForMotorToStop(brick);
+                WaitForMotorToStop(brick, 'A');
                 if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
                 brick.MotorA.On(5, (thirdPosition - 4), true);
-                WaitForMotorToStop(brick);
+                WaitForMotorToStop(brick, 'A');
                 if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
                 brick.MotorA.On(-5, 67, true);
-                WaitForMotorToStop(brick);
+                WaitForMotorToStop(brick, 'A');
                 if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
                 brick.MotorA.Off(true);
                 
             }
+        }
+
+        private void testDrop(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            Console.WriteLine("Starting to test drop movement!");
+            var touchSensorDesk = new TouchSensor();
+            brick.Sensor1 = touchSensorDesk;
+            uint pos = 76;
+
+            while (true)
+            {
+                if (touchSensorDesk.Read() == 1)
+                {
+                    brick.MotorB.ResetTacho(true);
+                    brick.MotorB.On(100, pos, false);
+                    WaitForMotorToStop(brick, 'B');
+                    brick.MotorB.On(-100, pos, true);
+                    WaitForMotorToStop(brick, 'B');
+                    brick.MotorB.Off(true);
+                }
+            }
+        }
+
+        private void dropCube(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            brick.MotorB.ResetTacho(true);
+            brick.MotorB.On(100, 76, false);
+            WaitForMotorToStop(brick, 'B');
+            brick.MotorB.On(-100, 76, true);
+            WaitForMotorToStop(brick, 'B');
+            brick.MotorB.Off(true);
         }
 
         private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -242,10 +274,20 @@ namespace Mindstorms_EV3.EV3
                 
            
         }
-        void WaitForMotorToStop(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        void WaitForMotorToStop(Brick<Sensor, Sensor, Sensor, Sensor> brick, char motor)
         {
-            Thread.Sleep(500);
-            while (brick.MotorA.IsRunning()) { Thread.Sleep(50); }
+            switch (motor)
+            {
+                case 'A':
+                    Thread.Sleep(500);
+                    while (brick.MotorA.IsRunning()) { Thread.Sleep(50); }
+                    break;
+                case 'B':
+                    Thread.Sleep(500);
+                    while (brick.MotorB.IsRunning()) { Thread.Sleep(50); }
+                    break;
+            }
+
         }
 
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -253,6 +295,7 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
+            testDrop(brick);
             //checkFullArmMovement(brick);
             //     checkSensors(brick, true);
             /*
