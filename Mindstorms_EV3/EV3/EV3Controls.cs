@@ -34,7 +34,8 @@ namespace Mindstorms_EV3.EV3
         private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             var move = algorithm.ev3Move();
-            var armMotor = brick.MotorA;
+            var armMotor = brick.MotorB;
+            var boardMotor = brick.MotorA;
             switch (move[0])
             {
            
@@ -77,20 +78,16 @@ namespace Mindstorms_EV3.EV3
 
         }
 
-        private void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick, bool debugSensors = false)
+        private void checkSensors(Brick<Sensor, Sensor, Sensor, Sensor> brick, bool debugSensors = false, int forLoop = 10)
         {
             Console.WriteLine("Testing sensors...");
             var colorSensor = new ColorSensor();
-            var irSensor = new IRSensor();
             var touchSensor = new TouchSensor();
             brick.Sensor1 = touchSensor;
             brick.Sensor2 = colorSensor;
-            brick.Sensor3 = irSensor;
 
 
-            if (colorSensor.ReadColor() == Color.None
-                || irSensor.ReadAsString() == "128"
-                || touchSensor.ReadAsString == null)
+            if (touchSensor.ReadAsString == null)
             {
                 throw (new Exception("Some sensors are null!"));
             }else
@@ -98,10 +95,10 @@ namespace Mindstorms_EV3.EV3
                 Console.WriteLine("Sensors tested!");
             }
 
-            for (int i = 0; i < 10 && debugSensors; i++)
+            for (int i = 0; i < forLoop && debugSensors; i++)
             {
                 Thread.Sleep(1000);
-                Console.WriteLine($"\n\nColor Sensor: ${colorSensor.ReadColor()}\nIR Sensor {irSensor.ReadAsString()}\n" +
+                Console.WriteLine($"\n\nColor Sensor: ${colorSensor.ReadColor()}\n" +
                     $"Touch Sensor {touchSensor.ReadAsString()}\n\n");
             }
         }
@@ -145,6 +142,7 @@ namespace Mindstorms_EV3.EV3
             {
                 if (touchSensorDesk.Read() == 1)
                 {
+                    Console.WriteLine("Dropped cube!");
                     brick.MotorB.ResetTacho(true);
                     brick.MotorB.On(100, pos, false);
                     WaitForMotorToStop(brick, 'B');
@@ -157,24 +155,19 @@ namespace Mindstorms_EV3.EV3
 
         private void dropCube(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            brick.MotorB.ResetTacho(true);
-            brick.MotorB.On(100, 76, false);
+            var armMotor = brick.MotorB;
+
+            armMotor.ResetTacho(true);
+            armMotor.On(100, 76, false);
             WaitForMotorToStop(brick, 'B');
-            brick.MotorB.On(-100, 76, true);
+            armMotor.On(-100, 76, true);
             WaitForMotorToStop(brick, 'B');
-            brick.MotorB.Off(true);
+            armMotor.Off(true);
         }
 
         private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            var distanceSensor = new IRSensor();
-            brick.Sensor2 = distanceSensor;
-            distanceSensor.Initialize();
-
-            while (distanceSensor.Read() < 255)
-            {
-                Thread.Sleep(500);
-            }
+            //TODO: give player 20s to play their move, after 20s check the grid if something changed if yes, player played if not repeat the wait
         }
 
         private char readGrid(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -193,7 +186,7 @@ namespace Mindstorms_EV3.EV3
                             returnValue = 'X';
                             break;
                         }
-                    case Color.Green:
+                    case Color.Yellow:
                         {
                             returnValue = 'O';
                             break;
@@ -295,6 +288,7 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
+            checkSensors(brick, true, 5000);
             testDrop(brick);
             //checkFullArmMovement(brick);
             //     checkSensors(brick, true);

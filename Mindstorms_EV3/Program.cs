@@ -13,7 +13,7 @@ public class Program
         //bigger docs xd: https://github.com/smallrobots/monoev3
 
         EV3Controls eV3Controls = new EV3Controls();
-           var brick = new Brick<Sensor, Sensor, Sensor, Sensor>("usb");
+        var brick = new Brick<Sensor, Sensor, Sensor, Sensor>("usb");
         eV3Controls.init(brick);
 
     }
