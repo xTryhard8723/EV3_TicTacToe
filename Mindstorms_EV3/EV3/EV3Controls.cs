@@ -108,25 +108,32 @@ namespace Mindstorms_EV3.EV3
             Console.WriteLine("Starting to test arm movement!");
             var touchSensorDesk = new TouchSensor();
             brick.Sensor1 = touchSensorDesk;
-            uint thirdPosition = 26;
-            while (touchSensorDesk.Read() == 0)
+            var motorToMoveArm = brick.MotorA;
+            uint thirdPosition = 18;
+            while (true)
             {
-                brick.MotorA.ResetTacho(true);
-                if (debugConsole) { Console.WriteLine($"Tacho count: {brick.MotorA.GetTachoCount()}"); }
+                motorToMoveArm.ResetTacho(true);
+                if (debugConsole) { Console.WriteLine($"Tacho count: {motorToMoveArm.GetTachoCount()}"); }
                 Thread.Sleep(500);
-                brick.MotorA.On(5, thirdPosition, true);
+                motorToMoveArm.On(5, thirdPosition-2, true);
                 WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
-                brick.MotorA.On(5, thirdPosition, true);
+                readGrid(brick);
+                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
+                motorToMoveArm.On(5, thirdPosition, true);
                 WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
-                brick.MotorA.On(5, (thirdPosition - 4), true);
+                readGrid(brick);
+                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
+                motorToMoveArm.On(5, thirdPosition, true);
                 WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
-                brick.MotorA.On(-5, 67, true);
+                readGrid(brick);
+                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
+                motorToMoveArm.On(5, (thirdPosition), true);
                 WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + brick.MotorA.GetTachoCount()); }
-                brick.MotorA.Off(true);
+                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
+                motorToMoveArm.On(-5, 4*thirdPosition-7, true);
+                WaitForMotorToStop(brick, 'A');
+                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
+                motorToMoveArm.Off(true);
                 
             }
         }
@@ -179,6 +186,7 @@ namespace Mindstorms_EV3.EV3
 
             do
             {
+                //Console.WriteLine($"Barva prectena (potencionalne spatne) {readColor.ToString()}");
                 switch (readColor)
                 {
                     case Color.Red:
@@ -197,8 +205,8 @@ namespace Mindstorms_EV3.EV3
                             break;
                         }
                 }
-            } while(returnValue != 1 || returnValue.ToString().Length > 0);
-
+            } while(returnValue == '1');
+            Console.WriteLine($"Barva prectena ted: {readColor.ToString()}");
             return returnValue;
 
         }
@@ -222,7 +230,7 @@ namespace Mindstorms_EV3.EV3
             }
             catch (Exception ex)
             {
-                throw (new Exception(ex.Message));
+                throw (new Exception($"Brick is not connected! {Environment.NewLine}{ex.Message}"));
             }
             Console.WriteLine("Brick is connected!");
 
@@ -288,8 +296,9 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
-            checkSensors(brick, true, 5000);
-            testDrop(brick);
+            //checkSensors(brick, true, 5000);
+            checkFullArmMovement(brick);
+            //testDrop(brick);
             //checkFullArmMovement(brick);
             //     checkSensors(brick, true);
             /*
