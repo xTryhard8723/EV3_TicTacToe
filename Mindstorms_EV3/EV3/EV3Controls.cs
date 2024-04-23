@@ -28,30 +28,59 @@ namespace Mindstorms_EV3.EV3
         {
             //TODO: move the whole grid, execute readGrid() and in readgrid or here write into the table with values of physical player
             var tempBoard = getBoard();
+            int[] coords;
+            var boardMotor = brick.MotorC;
+            var test = 0;
+
+            while (test != 2)
+            {
+                for (int i = 0; i <= 2; i++)
+                {
+                    coords = new int[2] { i, test };
+                    ev3Play(brick, coords);
+                    if (i == 2) { boardMotor.On(-5, 188, true); WaitForMotorToStop(brick, 'C'); }
+                }
+                test++;
+            }
+
 
         }
 
-        private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick, int[]? readCoords = null)
         {
-            var move = algorithm.ev3Move();
-            var armMotor = brick.MotorB;
-            var boardMotor = brick.MotorA;
+            var move = new int[2];
+            if(readCoords == null)
+            {
+                move = algorithm.ev3Move();
+            }else
+            {
+                move = readCoords;
+            }
+            var armMotor = brick.MotorA;
+            var boardMotor = brick.MotorC;
+
+            armMotor.ResetTacho(true);
+            boardMotor.ResetTacho(true);
+
             switch (move[0])
             {
            
                 case 0:
                     {
-                        //motors bring first row of board
-                        armMotor.On(5, 26, true);
                         break;
                     }
                 case 1:
                     {
+
+                        boardMotor.On(5, 94, true);
+                        WaitForMotorToStop(brick, 'C');
                         //motors bring middle row of board
                         break;
                     }
                 case 2:
                     {
+                        boardMotor.On(5, 94, true);
+                        WaitForMotorToStop(brick, 'C');
                         //motors bring last row of board
                         break;
                     }
@@ -66,7 +95,13 @@ namespace Mindstorms_EV3.EV3
                     }
                 case 1:
                     {
-                        //motors bring go left or right and drop cube
+                        armMotor.On(5, 40, true);
+                        WaitForMotorToStop(brick, 'A');
+                        dropCube(brick);
+                        armMotor.On(-5, 43, true);
+                        WaitForMotorToStop(brick, 'A');
+                        boardMotor.On(-5, 94, true);
+                        WaitForMotorToStop(brick, 'C');
                         break;
                     }
                 case 2:
@@ -109,33 +144,37 @@ namespace Mindstorms_EV3.EV3
             var touchSensorDesk = new TouchSensor();
             brick.Sensor1 = touchSensorDesk;
             var motorToMoveArm = brick.MotorA;
-            uint thirdPosition = 18;
             while (true)
             {
                 motorToMoveArm.ResetTacho(true);
-                if (debugConsole) { Console.WriteLine($"Tacho count: {motorToMoveArm.GetTachoCount()}"); }
                 Thread.Sleep(500);
-                motorToMoveArm.On(5, thirdPosition-2, true);
+                readGrid(brick);
+                motorToMoveArm.On(5, 22, true);
                 WaitForMotorToStop(brick, 'A');
                 readGrid(brick);
-                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
-                motorToMoveArm.On(5, thirdPosition, true);
+                motorToMoveArm.On(5, 19, true);
                 WaitForMotorToStop(brick, 'A');
                 readGrid(brick);
-                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
-                motorToMoveArm.On(5, thirdPosition, true);
+                motorToMoveArm.On(5, 19, true);
                 WaitForMotorToStop(brick, 'A');
-                readGrid(brick);
-                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
-                motorToMoveArm.On(5, (thirdPosition), true);
-                WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
-                motorToMoveArm.On(-5, 4*thirdPosition-7, true);
-                WaitForMotorToStop(brick, 'A');
-                if (debugConsole) { Console.WriteLine("Position: " + motorToMoveArm.GetTachoCount()); }
-                motorToMoveArm.Off(true);
-                
             }
+        }
+
+        private void boardFullMovement(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+        {
+            var boardMotor = brick.MotorC;
+
+            boardMotor.ResetTacho(true);
+            boardMotor.On(-5, 94, true);
+            WaitForMotorToStop(brick, 'C');
+            boardMotor.On(-5, 94, true);
+            WaitForMotorToStop(brick, 'C');
+            boardMotor.On(5, 100, true);
+            WaitForMotorToStop(brick, 'C');
+            boardMotor.On(5, 100, true);
+            WaitForMotorToStop(brick, 'C');
+
+
         }
 
         private void testDrop(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -151,7 +190,7 @@ namespace Mindstorms_EV3.EV3
                 {
                     Console.WriteLine("Dropped cube!");
                     brick.MotorB.ResetTacho(true);
-                    brick.MotorB.On(100, pos, false);
+                    brick.MotorB.On(5, pos, false);
                     WaitForMotorToStop(brick, 'B');
                     brick.MotorB.On(-100, pos, true);
                     WaitForMotorToStop(brick, 'B');
@@ -164,6 +203,7 @@ namespace Mindstorms_EV3.EV3
         {
             var armMotor = brick.MotorB;
 
+            Console.WriteLine("Dropped cube!");
             armMotor.ResetTacho(true);
             armMotor.On(100, 76, false);
             WaitForMotorToStop(brick, 'B');
@@ -287,8 +327,12 @@ namespace Mindstorms_EV3.EV3
                     Thread.Sleep(500);
                     while (brick.MotorB.IsRunning()) { Thread.Sleep(50); }
                     break;
+                case 'C':
+                    Thread.Sleep(500);
+                    while (brick.MotorC.IsRunning()) { Thread.Sleep(50); }
+                    break;
             }
-
+            Thread.Sleep(700);
         }
 
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -296,8 +340,12 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
+            moveOnGridToRead(brick);
+            //ev3Play(brick);
+            //boardFullMovement(brick);
             //checkSensors(brick, true, 5000);
-            checkFullArmMovement(brick);
+            //checkFullArmMovement(brick);
+            //testDrop(brick);
             //testDrop(brick);
             //checkFullArmMovement(brick);
             //     checkSensors(brick, true);
