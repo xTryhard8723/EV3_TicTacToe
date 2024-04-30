@@ -30,6 +30,65 @@ namespace Mindstorms_EV3.EV3
             ev3Play(brick, coord);
         }
 
+        private async void manualMovement(Brick<Sensor,Sensor,Sensor, Sensor> brick)
+        {
+            var armMotor = brick.MotorA;
+            Console.WriteLine("Press the left or right arrow key. Press 'Q' to quit.");
+
+            bool moving = false;
+
+            while (true)
+            {
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+                    if (keyInfo.Key == ConsoleKey.LeftArrow)
+                    {
+                        Console.WriteLine("Left arrow pressed. Moving left...");
+                        moving = true;
+                        while (moving)
+                        {
+                            // Perform left movement action here
+                            armMotor.On(-5, 10, true);
+                            // Adjust sleep time or add motor control logic as necessary
+                            Thread.Sleep(100); // Adjust sleep time as needed
+                            if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.LeftArrow)
+                                moving = false;
+                        }
+                        Console.WriteLine("Stopped moving left.");
+                    }
+                    else if (keyInfo.Key == ConsoleKey.RightArrow)
+                    {
+                        Console.WriteLine("Right arrow pressed. Moving right...");
+                        moving = true;
+                        while (moving)
+                        {
+                            // Perform right movement action here
+                            armMotor.On(5, 10, true);
+                            // Adjust sleep time or add motor control logic as necessary
+                            Thread.Sleep(100); // Adjust sleep time as needed
+                            if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.RightArrow)
+                                moving = false;
+                        }
+                        Console.WriteLine("Stopped moving right.");
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Spacebar)
+                    {
+                        dropCube(brick);
+                      
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Q)
+                    {
+                        Console.WriteLine("Quitting...");
+                        break;
+                    }
+
+                }
+            }
+
+        }
+
         private void moveOnGridToRead(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             //TODO: move the whole grid, execute readGrid() and in readgrid or here write into the table with values of physical player
@@ -39,17 +98,19 @@ namespace Mindstorms_EV3.EV3
             armMotor.ResetTacho();
             boardMotor.ResetTacho();
 
-
-            tempBoard[0, 0] = readGrid(brick);
-            armMotor.On(5, 20, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 1] = readGrid(brick);
-            armMotor.On(5, 15, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 2] = readGrid(brick);
-            armMotor.On(-5, 40, true);
-            WaitForMotorToStop(brick, 'A');
-
+            while (true)
+            {
+                tempBoard[0, 0] = readGrid(brick);
+                armMotor.On(8, 20, true);
+                WaitForMotorToStop(brick, 'A');
+                tempBoard[0, 1] = readGrid(brick);
+                armMotor.On(8, 15, true);
+                WaitForMotorToStop(brick, 'A');
+                tempBoard[0, 2] = readGrid(brick);
+                armMotor.On(-8, 40, true);
+                WaitForMotorToStop(brick, 'A');
+            }
+            /*
             boardMotor.On(5, 125, true);
             WaitForMotorToStop(brick, 'C');
 
@@ -77,7 +138,7 @@ namespace Mindstorms_EV3.EV3
             tempBoard[0, 2] = readGrid(brick);
             armMotor.On(-5, 40, true);
             WaitForMotorToStop(brick, 'A');
-
+            */
         }
 
         private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick, int[]? readCoords = null)
@@ -371,7 +432,8 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
-            moveOnGridToRead(brick);
+            // moveOnGridToRead(brick);
+            manualMovement(brick);
             //test(brick);
             //ev3Play(brick);
             //boardFullMovement(brick);
