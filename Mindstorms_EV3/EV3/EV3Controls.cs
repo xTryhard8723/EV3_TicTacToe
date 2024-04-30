@@ -26,14 +26,14 @@ namespace Mindstorms_EV3.EV3
 
         private void test(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            int[] coord = new int[2] {2, 2};
+            int[] coord = new int[2] {1, 1};
             ev3Play(brick, coord);
         }
 
         private async void manualMovement(Brick<Sensor,Sensor,Sensor, Sensor> brick)
         {
             var armMotor = brick.MotorA;
-            Console.WriteLine("Press the left or right arrow key. Press 'Q' to quit.");
+            var boardMotor = brick.MotorC;
 
             bool moving = false;
 
@@ -51,6 +51,7 @@ namespace Mindstorms_EV3.EV3
                         {
                             // Perform left movement action here
                             armMotor.On(-5, 10, true);
+                            WaitForMotorToStop(brick, 'A');
                             // Adjust sleep time or add motor control logic as necessary
                             Thread.Sleep(100); // Adjust sleep time as needed
                             if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.LeftArrow)
@@ -66,6 +67,7 @@ namespace Mindstorms_EV3.EV3
                         {
                             // Perform right movement action here
                             armMotor.On(5, 10, true);
+                            WaitForMotorToStop(brick, 'A');
                             // Adjust sleep time or add motor control logic as necessary
                             Thread.Sleep(100); // Adjust sleep time as needed
                             if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.RightArrow)
@@ -78,10 +80,52 @@ namespace Mindstorms_EV3.EV3
                         dropCube(brick);
                       
                     }
-                    else if (keyInfo.Key == ConsoleKey.Q)
+                    else if (keyInfo.Key == ConsoleKey.UpArrow)
                     {
-                        Console.WriteLine("Quitting...");
-                        break;
+                        Console.WriteLine("Up arrow pressed. Moving up...");
+                        moving = true;
+                        while (moving)
+                        {
+                            // Perform right movement action here
+                            boardMotor.On(5, 50, true);
+                            WaitForMotorToStop(brick, 'C');
+                            // Adjust sleep time or add motor control logic as necessary
+                            Thread.Sleep(100); // Adjust sleep time as needed
+                            if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.RightArrow)
+                                moving = false;
+                        }
+                        Console.WriteLine("Stopped moving up.");
+                    }
+                    else if (keyInfo.Key == ConsoleKey.DownArrow)
+                    {
+                        Console.WriteLine("Down arrow pressed. Moving down...");
+                        moving = true;
+                        while (moving)
+                        {
+                            // Perform right movement action here
+                            boardMotor.On(-5, 50, true);
+                            WaitForMotorToStop(brick, 'C');
+                            // Adjust sleep time or add motor control logic as necessary
+                            Thread.Sleep(100); // Adjust sleep time as needed
+                            if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.RightArrow)
+                                moving = false;
+                        }
+                        Console.WriteLine("Stopped moving down.");
+                    }
+                    else if (keyInfo.Key == ConsoleKey.R)
+                    {
+                        Console.WriteLine("Reading!");
+                        moving = true;
+                        while (moving)
+                        {
+                            // Perform right movement action here
+                            readGrid(brick);
+                            // Adjust sleep time or add motor control logic as necessary
+                            Thread.Sleep(100); // Adjust sleep time as needed
+                            if (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.RightArrow)
+                                moving = false;
+                        }
+                        Console.WriteLine("Stopped reading.");
                     }
 
                 }
@@ -100,6 +144,7 @@ namespace Mindstorms_EV3.EV3
 
             while (true)
             {
+                /*
                 tempBoard[0, 0] = readGrid(brick);
                 armMotor.On(8, 20, true);
                 WaitForMotorToStop(brick, 'A');
@@ -109,6 +154,23 @@ namespace Mindstorms_EV3.EV3
                 tempBoard[0, 2] = readGrid(brick);
                 armMotor.On(-8, 40, true);
                 WaitForMotorToStop(brick, 'A');
+                */
+                readGrid(brick);
+                
+                armMotor.On(5, 33, true);
+                WaitForMotorToStop(brick, 'A');
+                readGrid(brick);
+                armMotor.On(-5, 36, true);
+                WaitForMotorToStop(brick, 'A');
+                readGrid(brick);
+                armMotor.On(5, 50, true);
+                WaitForMotorToStop(brick, 'A');
+                readGrid(brick);
+                armMotor.On(-5, 53, true);
+                WaitForMotorToStop(brick, 'A');
+
+                boardMotor.On(5, 125, true);
+                WaitForMotorToStop(brick, 'C');
             }
             /*
             boardMotor.On(5, 125, true);
@@ -315,10 +377,23 @@ namespace Mindstorms_EV3.EV3
             brick.Sensor2 = colorReadSensor;
             Color readColor = colorReadSensor.ReadColor();
             char returnValue;
+            var debugMovement = 0;
 
             do
             {
-                //Console.WriteLine($"Barva prectena (potencionalne spatne) {readColor.ToString()}");
+                if(debugMovement == 3)
+                {
+                    var armMotor = brick.MotorA;
+                    armMotor.On(5, 10, true);
+                    WaitForMotorToStop(brick, 'A');
+                }
+                if (debugMovement == 4)
+                {
+                    var armMotor = brick.MotorA;
+                    armMotor.On(-5, 15, true);
+                    WaitForMotorToStop(brick, 'A');
+                }
+                Console.WriteLine($"Barva prectena (potencionalne spatne) {readColor.ToString()}");
                 switch (readColor)
                 {
                     case Color.Red:
@@ -333,6 +408,7 @@ namespace Mindstorms_EV3.EV3
                         }
                     default:
                         {
+                            debugMovement++;
                             returnValue = '1';
                             break;
                         }
@@ -432,7 +508,7 @@ namespace Mindstorms_EV3.EV3
             
             connectBrick(brick);
             turnPlayerO(brick);
-            // moveOnGridToRead(brick);
+            //moveOnGridToRead(brick);
             manualMovement(brick);
             //test(brick);
             //ev3Play(brick);
