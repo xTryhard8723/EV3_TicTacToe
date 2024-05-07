@@ -1,6 +1,7 @@
 using MonoBrick.EV3;
 using Mindstorms_EV3.Algorithms;
 using Mindstorms.Core.Commands.Mathematics.Arithmetic;
+using Mindstorms.Core.Commands.File;
 
 namespace Mindstorms_EV3.EV3
 {
@@ -26,8 +27,8 @@ namespace Mindstorms_EV3.EV3
 
         private void test(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            int[] coord = new int[2] {1, 1};
-            ev3Play(brick, coord);
+            int[] coords = new int[2] { 0, 0 };
+            ev3Play(brick, coords);
         }
 
         private async void manualMovement(Brick<Sensor,Sensor,Sensor, Sensor> brick)
@@ -133,86 +134,9 @@ namespace Mindstorms_EV3.EV3
 
         }
 
-        private void moveOnGridToRead(Brick<Sensor, Sensor, Sensor, Sensor> brick)
+       
+        private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick, int[] move)
         {
-            //TODO: move the whole grid, execute readGrid() and in readgrid or here write into the table with values of physical player
-            var tempBoard = getBoard();
-            var boardMotor = brick.MotorC;
-            var armMotor = brick.MotorA;
-            armMotor.ResetTacho();
-            boardMotor.ResetTacho();
-
-            while (true)
-            {
-                /*
-                tempBoard[0, 0] = readGrid(brick);
-                armMotor.On(8, 20, true);
-                WaitForMotorToStop(brick, 'A');
-                tempBoard[0, 1] = readGrid(brick);
-                armMotor.On(8, 15, true);
-                WaitForMotorToStop(brick, 'A');
-                tempBoard[0, 2] = readGrid(brick);
-                armMotor.On(-8, 40, true);
-                WaitForMotorToStop(brick, 'A');
-                */
-                readGrid(brick);
-                
-                armMotor.On(5, 33, true);
-                WaitForMotorToStop(brick, 'A');
-                readGrid(brick);
-                armMotor.On(-5, 36, true);
-                WaitForMotorToStop(brick, 'A');
-                readGrid(brick);
-                armMotor.On(5, 50, true);
-                WaitForMotorToStop(brick, 'A');
-                readGrid(brick);
-                armMotor.On(-5, 53, true);
-                WaitForMotorToStop(brick, 'A');
-
-                boardMotor.On(5, 125, true);
-                WaitForMotorToStop(brick, 'C');
-            }
-            /*
-            boardMotor.On(5, 125, true);
-            WaitForMotorToStop(brick, 'C');
-
-            armMotor.ResetTacho();
-            tempBoard[0, 0] = readGrid(brick);
-            armMotor.On(5, 25, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 1] = readGrid(brick);
-            armMotor.On(5, 20, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 2] = readGrid(brick);
-            armMotor.On(-5, 50, true);
-            WaitForMotorToStop(brick, 'A');
-
-            boardMotor.On(5, 125, true);
-            WaitForMotorToStop(brick, 'C');
-
-            armMotor.ResetTacho();
-            tempBoard[0, 0] = readGrid(brick);
-            armMotor.On(5, 20, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 1] = readGrid(brick);
-            armMotor.On(5, 15, true);
-            WaitForMotorToStop(brick, 'A');
-            tempBoard[0, 2] = readGrid(brick);
-            armMotor.On(-5, 40, true);
-            WaitForMotorToStop(brick, 'A');
-            */
-        }
-
-        private void ev3Play(Brick<Sensor, Sensor, Sensor, Sensor> brick, int[]? readCoords = null)
-        {
-            int[]move;
-            if(readCoords == null)
-            {
-                move = algorithm.ev3Move();
-            }else
-            {
-                move = readCoords;
-            }
             var armMotor = brick.MotorA;
             var boardMotor = brick.MotorC;
 
@@ -226,21 +150,22 @@ namespace Mindstorms_EV3.EV3
             {
                 case 0:
                     {
-
-                        //motors bring go left or right and drop cube
+                        armMotor.On(5, 35, true);
+                        moveBackArm = 38;
+                        WaitForMotorToStop(brick, 'A');
                         break;
                     }
                 case 1:
                     {
-                        armMotor.On(5, 45, true);
-                        moveBackArm = 48;
+                        armMotor.On(5, 49, true);
+                        moveBackArm = 52;
                         WaitForMotorToStop(brick, 'A');
                         break;
                     }
                 case 2:
                     {
-                        armMotor.On(5, 60, true);
-                        moveBackArm = 63;
+                        armMotor.On(5, 70, true);
+                        moveBackArm = 73;
                         WaitForMotorToStop(brick, 'A');
                         break;
                     }
@@ -359,16 +284,11 @@ namespace Mindstorms_EV3.EV3
 
             Console.WriteLine("Dropped cube!");
             armMotor.ResetTacho(true);
-            armMotor.On(100, 76, false);
+            armMotor.On(10, 100, false);
             WaitForMotorToStop(brick, 'B');
-            armMotor.On(-100, 76, true);
+            armMotor.On(-100, 100, true);
             WaitForMotorToStop(brick, 'B');
             armMotor.Off(true);
-        }
-
-        private void checkPlayerInput(Brick<Sensor, Sensor, Sensor, Sensor> brick)
-        {
-            //TODO: give player 20s to play their move, after 20s check the grid if something changed if yes, player played if not repeat the wait
         }
 
         private char readGrid(Brick<Sensor, Sensor, Sensor, Sensor> brick)
@@ -464,25 +384,6 @@ namespace Mindstorms_EV3.EV3
             board = updatedBoard;
         }
 
-        private void debugBoard(Brick<Sensor, Sensor, Sensor, Sensor> brick)
-        {
-            while(algorithm.checkWinner() == ' ') {
-                ev3Play(brick);
-            }
-            Console.WriteLine($"Winner: {algorithm.checkWinner()} \n");
-   
-            for (int i = 0; i < 3; i++)
-            {
-                for(int j = 0; j < 3; j++)
-                {
-                    var consoleOut = board[i, j] == ' ' ? 'N' : board[i, j];
-                    Console.Write(consoleOut);
-                }
-                Console.WriteLine("\n");
-            }
-                
-           
-        }
         void WaitForMotorToStop(Brick<Sensor, Sensor, Sensor, Sensor> brick, char motor)
         {
             switch (motor)
@@ -503,34 +404,87 @@ namespace Mindstorms_EV3.EV3
             Thread.Sleep(700);
         }
 
+        private static int[] ConvertToCoordinates(int input)
+        {
+            int[] coordinates = new int[2];
+            coordinates[0] = (input - 1) / 3;
+            coordinates[1] = (input - 1) % 3;
+            return coordinates;
+        }
+
+        private void manualGrid(Brick<Sensor,Sensor,Sensor,Sensor> brick)
+        {
+            char currentPlayer = 'X'; // Start with player X
+            var grid = getBoard();
+            // Get user input and update the grid until the game ends
+            while (algorithm.checkWinner() == ' ' && !algorithm.isBoardFull())
+            {
+                // Print the current grid
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        // If the cell is empty, print the number corresponding to its position
+                        // Otherwise, print the player's mark
+                        char cellValue = grid[i, j] == ' ' ? (char)('0' + i * 3 + j + 1) : grid[i, j];
+                        Console.Write($" {cellValue} ");
+                        if (j < 2) Console.Write("|");
+                    }
+                    Console.WriteLine();
+                    if (i < 2) Console.WriteLine("---+---+---");
+                }
+
+                // Prompt the current player for input
+                Console.WriteLine($"Player {currentPlayer}, enter number (1-9):");
+
+                int input = int.Parse(Console.ReadLine());
+
+                if(input < 1 || input > 9)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Index out of bounds!! 1-9 pls :)");
+                    continue;
+                }
+
+                // Convert number to row and column coordinates
+                int row = (input - 1) / 3;
+                int col = (input - 1) % 3;
+
+                int[] play = new int[2] { row, col};
+
+                if (grid[row, col] != ' ')
+                {
+                    Console.WriteLine("This cell is already occupied. Please select another one.");
+                    Console.Clear();                    
+                    continue; // Skip the rest of the loop iteration and prompt the player again
+                }
+
+                ev3Play(brick, play);
+
+                // Update the grid with the player's move
+                grid[row, col] = currentPlayer;
+
+                // Switch players
+                currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+
+                // Print the updated grid
+                Console.Clear();
+                setBoard(grid);
+            }
+
+            var winner = algorithm.checkWinner() == ' ' ? 'N' : algorithm.checkWinner();
+ 
+            Console.Clear();
+            Console.WriteLine($"Vyhral hrac: {winner}");
+            Console.ReadLine();
+        }
+
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
-            
             connectBrick(brick);
             turnPlayerO(brick);
-            //moveOnGridToRead(brick);
-            manualMovement(brick);
             //test(brick);
-            //ev3Play(brick);
-            //boardFullMovement(brick);
-            //checkSensors(brick, true, 5000);
-            //checkFullArmMovement(brick);
-            //testDrop(brick);
-            //testDrop(brick);
-            //checkFullArmMovement(brick);
-            //     checkSensors(brick, true);
-            /*
-              while(algorithm.checkWinner() == ' ' || algorithm.isBoardFull() || !getStart(brick))
-              {
-                  turnPlayerO(brick);
-
-                  turnPlayerX(brick);
-                  checkPlayerInput(brick);
-                  readGrid(brick);
-
-              }*/
-          //  disconnectBrick(brick);
-           
+            manualGrid(brick);  
         }
 
     }
