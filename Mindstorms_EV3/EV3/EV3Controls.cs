@@ -404,14 +404,6 @@ namespace Mindstorms_EV3.EV3
             Thread.Sleep(700);
         }
 
-        private static int[] ConvertToCoordinates(int input)
-        {
-            int[] coordinates = new int[2];
-            coordinates[0] = (input - 1) / 3;
-            coordinates[1] = (input - 1) % 3;
-            return coordinates;
-        }
-
         private void manualGrid(Brick<Sensor,Sensor,Sensor,Sensor> brick)
         {
             char currentPlayer = 'X'; // Start with player X
@@ -419,6 +411,19 @@ namespace Mindstorms_EV3.EV3
             // Get user input and update the grid until the game ends
             while (algorithm.checkWinner() == ' ' && !algorithm.isBoardFull())
             {
+                switch (currentPlayer)
+                {
+                    case 'X':
+                        {
+                            turnPlayerX(brick);
+                            break;
+                        }
+                    case 'O':
+                        {
+                            turnPlayerO(brick);
+                            break;
+                        }
+                }
                 // Print the current grid
                 for (int i = 0; i < 3; i++)
                 {
@@ -443,6 +448,7 @@ namespace Mindstorms_EV3.EV3
                 {
                     Console.Clear();
                     Console.WriteLine("Index out of bounds!! 1-9 pls :)");
+                    Thread.Sleep(1500);
                     continue;
                 }
 
@@ -455,6 +461,7 @@ namespace Mindstorms_EV3.EV3
                 if (grid[row, col] != ' ')
                 {
                     Console.WriteLine("This cell is already occupied. Please select another one.");
+                    Thread.Sleep(1500);
                     Console.Clear();                    
                     continue; // Skip the rest of the loop iteration and prompt the player again
                 }
@@ -475,15 +482,20 @@ namespace Mindstorms_EV3.EV3
             var winner = algorithm.checkWinner() == ' ' ? 'N' : algorithm.checkWinner();
  
             Console.Clear();
-            Console.WriteLine($"Vyhral hrac: {winner}");
+            if (winner == 'N')
+            {
+                Console.WriteLine("Nikdo nevyhral!!");
+            }
+            else
+            {
+                Console.WriteLine($"Vyhral hrac: {winner}");
+            }
             Console.ReadLine();
         }
 
         public void init(Brick<Sensor, Sensor, Sensor, Sensor> brick)
         {
             connectBrick(brick);
-            turnPlayerO(brick);
-            //test(brick);
             manualGrid(brick);  
         }
 
